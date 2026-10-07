@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - {{ portal_title }}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 280px); padding: 1.5rem 0;">
+  <div class="login-card-container">
+    
+    <!-- Portal Header Card -->
+    <div class="login-header-banner">
+      <img src="{{ url_for('static', filename='images/nec_logo.svg') }}" alt="Nandha Engineering College Crest" class="college-logo">
+      <h2>{{ college_name }}</h2>
+      <p>{{ portal_title }}</p>
+    </div>
+
+    <!-- Role Selection Tabs -->
+    <div class="login-tabs">
+      <button type="button" class="login-tab-btn {% if active_tab != 'admin' %}active{% endif %}" id="tabStudent">
+        🎓 Student Login
+      </button>
+      <button type="button" class="login-tab-btn {% if active_tab == 'admin' %}active{% endif %}" id="tabAdmin">
+        🛡️ Admin Login
+      </button>
+    </div>
+
+    <!-- Login Form -->
+    <div class="login-form-body">
+      <form action="{{ url_for('login') }}" method="POST" id="loginForm">
+        <input type="hidden" name="login_type" id="login_type" value="{{ active_tab if active_tab else 'student' }}">
+
+        <div class="form-group">
+          <label for="identifier" class="form-label" id="identifierLabel">
+            {% if active_tab == 'admin' %}Admin Username{% else %}Student ID / Roll No{% endif %}
+          </label>
+          <input 
+            type="text" 
+            name="identifier" 
+            id="identifier" 
+            class="form-control" 
+            value="{{ identifier if identifier else '' }}" 
+            placeholder="{% if active_tab == 'admin' %}e.g. admin{% else %}e.g. STU001{% endif %}"
+            required
+            autocomplete="username"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input 
+            type="password" 
+            name="password" 
+            id="password" 
+            class="form-control" 
+            placeholder="Enter your account password" 
+            required
+            autocomplete="current-password"
+          >
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="loginSubmitBtn" style="padding: 0.8rem; margin-top: 0.5rem;">
+          🔐 Sign In
+        </button>
+      </form>
+
+      <!-- Student Demo Credentials Box -->
+      <div class="demo-credentials-box" id="studentDemoBox" style="{% if active_tab == 'admin' %}display: none;{% endif %}">
+        <div class="demo-credentials-title">
+          <span>💡 Demo Student Accounts:</span>
+          <span style="font-size: 0.75rem; color: #64748b;">(Click to Auto-fill)</span>
+        </div>
+        <div class="demo-creds-row">
+          <span>Student ID: <strong>STU001</strong> | Pass: <strong>student123</strong></span>
+          <button type="button" class="btn-fill-cred" data-fill-type="student" data-fill-id="STU001" data-fill-pass="student123">
+            Auto-fill STU001
+          </button>
+        </div>
+        <div class="demo-creds-row" style="margin-top: 0.35rem;">
+          <span>Student ID: <strong>STU002</strong> | Pass: <strong>student123</strong></span>
+          <button type="button" class="btn-fill-cred" data-fill-type="student" data-fill-id="STU002" data-fill-pass="student123">
+            Auto-fill STU002
+          </button>
+        </div>
+      </div>
+
+      <!-- Admin Demo Credentials Box -->
+      <div class="demo-credentials-box" id="adminDemoBox" style="{% if active_tab != 'admin' %}display: none;{% endif %}">
+        <div class="demo-credentials-title">
+          <span>💡 Demo Admin Account:</span>
+          <span style="font-size: 0.75rem; color: #64748b;">(Click to Auto-fill)</span>
+        </div>
+        <div class="demo-creds-row">
+          <span>Username: <strong>admin</strong> | Pass: <strong>admin123</strong></span>
+          <button type="button" class="btn-fill-cred" data-fill-type="admin" data-fill-id="admin" data-fill-pass="admin123">
+            Auto-fill Admin
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

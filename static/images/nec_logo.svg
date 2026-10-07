@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="necGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f2b48" />
+      <stop offset="100%" stop-color="#1e4976" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+  </defs>
+  <!-- Outer Gold Ring -->
+  <circle cx="50" cy="50" r="48" fill="url(#necGrad)" stroke="url(#goldGrad)" stroke-width="3" />
+  <circle cx="50" cy="50" r="43" fill="none" stroke="#ffffff" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
+  <!-- Central Shield -->
+  <path d="M50 18 L72 26 V52 C72 66 50 78 50 78 C50 78 28 66 28 52 V26 Z" fill="#ffffff" stroke="url(#goldGrad)" stroke-width="2"/>
+  <!-- Shield Inside Details -->
+  <path d="M50 22 L68 29 V50 C68 62 50 72 50 72 C50 72 32 62 32 50 V29 Z" fill="#0f2b48"/>
+  <!-- Torch / Flame (Knowledge) -->
+  <path d="M50 30 C53 35 55 38 52 42 C49 46 51 49 50 50 C49 49 51 46 48 42 C45 38 47 35 50 30 Z" fill="url(#goldGrad)"/>
+  <!-- Open Book -->
+  <path d="M38 54 Q50 51 50 57 Q50 51 62 54 L62 61 Q50 58 50 63 Q50 58 38 61 Z" fill="#ffffff"/>
+  <!-- Gear teeth small -->
+  <circle cx="50" cy="50" r="2" fill="#f59e0b"/>
+  <!-- College text curved / banner -->
+  <path d="M26 84 Q50 91 74 84" fill="none" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

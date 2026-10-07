@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Online Student Complaint & Grievance Redressal System - Nandha Engineering College (Autonomous), Erode.">
+  <title>{% block title %}{{ portal_title }}{% endblock %} | {{ college_name }}</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- Top Info Bar -->
+  <header class="nec-header">
+    <div class="header-topbar">
+      <span class="affiliation">
+        🏛️ <strong>{{ college_name }}</strong> &nbsp;|&nbsp; Autonomous Institution &nbsp;|&nbsp; Approved by AICTE, New Delhi
+      </span>
+      <div class="contact-info">
+        <span>📍 Erode - Perundurai Road, Tamil Nadu</span>
+        <span>📞 Grievance Helpline: 04294-225588</span>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <div class="navbar-container">
+      <a href="{{ url_for('index') }}" class="brand-wrapper">
+        <img src="{{ url_for('static', filename='images/nec_logo.svg') }}" alt="NEC Logo" class="brand-logo">
+        <div class="brand-titles">
+          <h1>{{ college_name }}</h1>
+          <p><span class="portal-tag">Grievance Redressal Portal</span> • Student Complaint Management</p>
+        </div>
+      </a>
+
+      <button class="mobile-nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        ☰
+      </button>
+
+      <nav>
+        <ul class="nav-links">
+          {% if session.get('user_id') %}
+            {% if session.get('role') == 'student' %}
+              <li><a href="{{ url_for('student_dashboard') }}" class="{% if request.endpoint == 'student_dashboard' %}active{% endif %}">📊 Dashboard</a></li>
+              <li><a href="{{ url_for('submit_complaint') }}" class="{% if request.endpoint == 'submit_complaint' %}active{% endif %}">✍️ Submit Complaint</a></li>
+              <li><a href="{{ url_for('my_complaints') }}" class="{% if request.endpoint == 'my_complaints' %}active{% endif %}">📂 My Complaints</a></li>
+            {% elif session.get('role') == 'admin' %}
+              <li><a href="{{ url_for('admin_dashboard') }}" class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}">📋 Complaints Board</a></li>
+              <li><a href="{{ url_for('admin_students') }}" class="{% if request.endpoint == 'admin_students' %}active{% endif %}">👥 Student Directory</a></li>
+            {% endif %}
+
+            <li class="user-badge-wrap">
+              <span class="user-role-pill role-{{ session.get('role') }}">
+                {{ session.get('role') }}
+              </span>
+              <span style="font-size: 0.88rem; font-weight: 600; color: #ffffff;">
+                {{ session.get('name') }}
+              </span>
+              <a href="{{ url_for('logout') }}" class="btn-nav-logout" id="logoutBtn">
+                🚪 Logout
+              </a>
+            </li>
+          {% else %}
+            <li><a href="{{ url_for('login', tab='student') }}" class="{% if request.args.get('tab') == 'student' or not request.args.get('tab') %}active{% endif %}">Student Login</a></li>
+            <li><a href="{{ url_for('login', tab='admin') }}" class="{% if request.args.get('tab') == 'admin' %}active{% endif %}">Admin Login</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Flash Notification Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            <div class="alert-content">
+              {% if category == 'success' %}
+                <span>✅</span>
+              {% elif category == 'danger' %}
+                <span>⚠️</span>
+              {% elif category == 'warning' %}
+                <span>🔔</span>
+              {% else %}
+                <span>ℹ️</span>
+              {% endif %}
+              <span>{{ message }}</span>
+            </div>
+            <button type="button" class="alert-close" aria-label="Close notification">&times;</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Main Content Page Body -->
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Portal Footer -->
+  <footer class="nec-footer">
+    <div class="footer-container">
+      <div class="footer-copy">
+        <strong>{{ college_name }} (Autonomous)</strong>
+        <span>Student Grievance Redressal & Complaint Management Portal</span>
+        <span style="font-size: 0.78rem; color: #64748b;">Erode - Perundurai Main Road, Vaikkaalmedu, Erode, Tamil Nadu 638052</span>
+      </div>
+      <ul class="footer-links">
+        <li><span>Academic Year {{ current_year }}</span></li>
+        <li><span>Privacy & Ethics Policy</span></li>
+        <li><span>Internal Complaints Committee (ICC)</span></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

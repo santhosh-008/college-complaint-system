@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Registered Students Directory - {{ portal_title }}{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom: 1.5rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">👥 Student Directory</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Registered students with their complaint history and resolution records.</p>
+    </div>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary btn-sm">
+      &larr; Back to Complaints Board
+    </a>
+  </div>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+  <div class="table-responsive" style="border: none;">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Student ID</th>
+          <th>Student Name</th>
+          <th>Department</th>
+          <th>Email Address</th>
+          <th>Phone</th>
+          <th>Total Complaints</th>
+          <th>Resolved Complaints</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+          <tr>
+            <td>
+              <span class="complaint-id-link">{{ s.student_id }}</span>
+            </td>
+            <td>
+              <strong>{{ s.name }}</strong>
+            </td>
+            <td>{{ s.department }}</td>
+            <td>{{ s.email }}</td>
+            <td>{{ s.phone if s.phone else 'N/A' }}</td>
+            <td>
+              <span class="badge badge-category">{{ s.total_complaints }}</span>
+            </td>
+            <td>
+              <span class="badge badge-status-resolved"><span class="badge-dot"></span> {{ s.resolved_count }}</span>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

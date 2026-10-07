@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - {{ portal_title }}{% endblock %}
+
+{% block content %}
+<!-- Welcome Banner -->
+<div class="welcome-card">
+  <div class="welcome-info">
+    <h2>Welcome back, {{ session.get('name') }}! 👋</h2>
+    <p>Manage, submit, and track all your campus complaints and grievances in one unified portal.</p>
+    <div class="welcome-meta">
+      <span>🎓 <strong>Student ID:</strong> {{ session.get('student_id') }}</span>
+      <span>🏛️ <strong>Department:</strong> {{ session.get('department') }}</span>
+      <span>📧 <strong>Email:</strong> {{ session.get('email') }}</span>
+    </div>
+  </div>
+  <div class="welcome-actions">
+    <a href="{{ url_for('submit_complaint') }}" class="btn btn-accent" id="submitComplaintBtn">
+      ✍️ Submit Complaint
+    </a>
+    <a href="{{ url_for('my_complaints') }}" class="btn btn-secondary">
+      📂 My Complaints
+    </a>
+  </div>
+</div>
+
+<!-- KPI Stats Grid -->
+<div class="stats-grid">
+  <div class="stat-card total">
+    <div class="stat-icon">📑</div>
+    <div class="stat-data">
+      <h3 id="statTotal">{{ stats.total }}</h3>
+      <p>Total Complaints</p>
+    </div>
+  </div>
+
+  <div class="stat-card pending">
+    <div class="stat-icon">⏳</div>
+    <div class="stat-data">
+      <h3 id="statPending">{{ stats.pending }}</h3>
+      <p>Pending Review</p>
+    </div>
+  </div>
+
+  <div class="stat-card in-progress">
+    <div class="stat-icon">⚙️</div>
+    <div class="stat-data">
+      <h3 id="statInProgress">{{ stats.in_progress }}</h3>
+      <p>In Progress</p>
+    </div>
+  </div>
+
+  <div class="stat-card resolved">
+    <div class="stat-icon">✅</div>
+    <div class="stat-data">
+      <h3 id="statResolved">{{ stats.resolved }}</h3>
+      <p>Resolved</p>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Complaints Section -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">
+      <span>🕒</span> Recent Grievances & Status
+    </h2>
+    <div>
+      <a href="{{ url_for('my_complaints') }}" class="btn btn-outline-primary btn-sm">
+        View All Complaints &rarr;
+      </a>
+    </div>
+  </div>
+
+  {% if recent_complaints %}
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Complaint ID</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Priority</th>
+            <th>Date Submitted</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in recent_complaints %}
+            <tr>
+              <td>
+                <a href="{{ url_for('complaint_details', complaint_id=c.complaint_id) }}" class="complaint-id-link">
+                  {{ c.complaint_id }}
+                </a>
+              </td>
+              <td><strong>{{ c.title }}</strong></td>
+              <td>
+                <span class="badge badge-category">{{ c.category }}</span>
+              </td>
+              <td>
+                <span class="badge badge-priority-{{ c.priority | lower }}">{{ c.priority }}</span>
+              </td>
+              <td>{{ c.created_at[:10] }}</td>
+              <td>
+                {% if c.status == 'Pending' %}
+                  <span class="badge badge-status-pending"><span class="badge-dot"></span> Pending</span>
+                {% elif c.status == 'In Progress' %}
+                  <span class="badge badge-status-in-progress"><span class="badge-dot"></span> In Progress</span>
+                {% elif c.status == 'Resolved' %}
+                  <span class="badge badge-status-resolved"><span class="badge-dot"></span> Resolved</span>
+                {% else %}
+                  <span class="badge badge-status-rejected"><span class="badge-dot"></span> {{ c.status }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{{ url_for('complaint_details', complaint_id=c.complaint_id) }}" class="btn btn-secondary btn-sm">
+                  View Details
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">📝</div>
+      <h3>No Complaints Submitted Yet</h3>
+      <p>You currently do not have any registered complaints. If you are experiencing any campus or academic issues, submit a complaint now.</p>
+      <a href="{{ url_for('submit_complaint') }}" class="btn btn-primary">
+        + Submit Your First Complaint
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

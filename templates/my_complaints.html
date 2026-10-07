@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}My Complaints - {{ portal_title }}{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom: 1.5rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">📂 My Registered Complaints</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">View tracking progress, admin responses, and status history of all your submitted complaints.</p>
+    </div>
+    <a href="{{ url_for('submit_complaint') }}" class="btn btn-primary">
+      ✍️ Submit New Complaint
+    </a>
+  </div>
+</div>
+
+<!-- Search & Live Filters Bar -->
+<div class="filter-bar">
+  <div class="filter-group">
+    <!-- Live Search -->
+    <div class="search-input-wrap">
+      <span class="search-icon-inside">🔍</span>
+      <input type="text" id="searchInput" class="form-control" placeholder="Search by ID, title, or keywords...">
+    </div>
+
+    <!-- Status Filter -->
+    <div style="min-width: 150px;">
+      <select id="statusFilter" class="form-select">
+        <option value="">All Statuses</option>
+        {% for st in statuses %}
+          <option value="{{ st }}">{{ st }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Category Filter -->
+    <div style="min-width: 160px;">
+      <select id="categoryFilter" class="form-select">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+          <option value="{{ cat }}">{{ cat }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Priority Filter -->
+    <div style="min-width: 130px;">
+      <select id="priorityFilter" class="form-select">
+        <option value="">All Priorities</option>
+        {% for p in priorities %}
+          <option value="{{ p }}">{{ p }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <button type="button" id="resetFiltersBtn" class="btn btn-secondary btn-sm">
+      Reset Filters
+    </button>
+    <span id="filterCount" style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted);"></span>
+  </div>
+</div>
+
+<!-- Complaints Table -->
+<div class="card" style="padding: 0; overflow: hidden;">
+  <div class="table-responsive" style="border: none;">
+    <table class="table" id="complaintsTable">
+      <thead>
+        <tr>
+          <th>Complaint ID</th>
+          <th>Complaint Title</th>
+          <th>Category</th>
+          <th>Priority</th>
+          <th>Submitted On</th>
+          <th>Current Status</th>
+          <th style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if complaints %}
+          {% for c in complaints %}
+            <tr 
+              data-status="{{ c.status }}" 
+              data-category="{{ c.category }}" 
+              data-priority="{{ c.priority }}" 
+              data-dept="{{ c.department }}"
+            >
+              <td>
+                <a href="{{ url_for('complaint_details', complaint_id=c.complaint_id) }}" class="complaint-id-link">
+                  {{ c.complaint_id }}
+                </a>
+              </td>
+              <td>
+                <strong style="color: var(--text-main); font-size: 0.94rem;">{{ c.title }}</strong>
+                {% if c.admin_response %}
+                  <div style="font-size: 0.78rem; color: #059669; margin-top: 0.2rem; display: flex; align-items: center; gap: 0.3rem;">
+                    <span>💬</span> Admin response received
+                  </div>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge badge-category">{{ c.category }}</span>
+              </td>
+              <td>
+                <span class="badge badge-priority-{{ c.priority | lower }}">{{ c.priority }}</span>
+              </td>
+              <td>
+                <span style="color: var(--text-secondary); font-size: 0.85rem;">{{ c.created_at[:10] }}</span>
+              </td>
+              <td>
+                {% if c.status == 'Pending' %}
+                  <span class="badge badge-status-pending"><span class="badge-dot"></span> Pending</span>
+                {% elif c.status == 'In Progress' %}
+                  <span class="badge badge-status-in-progress"><span class="badge-dot"></span> In Progress</span>
+                {% elif c.status == 'Resolved' %}
+                  <span class="badge badge-status-resolved"><span class="badge-dot"></span> Resolved</span>
+                {% else %}
+                  <span class="badge badge-status-rejected"><span class="badge-dot"></span> {{ c.status }}</span>
+                {% endif %}
+              </td>
+              <td style="text-align: right;">
+                <a href="{{ url_for('complaint_details', complaint_id=c.complaint_id) }}" class="btn btn-secondary btn-sm">
+                  View Details &rarr;
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" class="table-empty">
+              <div class="empty-state" style="padding: 2.5rem 1rem;">
+                <div class="empty-state-icon">📋</div>
+                <h3>No Complaints Found</h3>
+                <p>You have not registered any complaints yet.</p>
+                <a href="{{ url_for('submit_complaint') }}" class="btn btn-primary btn-sm">
+                  + Submit a Complaint
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% endif %}
+
+        <!-- Row displayed dynamically when live search finds nothing -->
+        <tr id="noResultsRow" style="display: none;">
+          <td colspan="7" class="table-empty">
+            <div style="padding: 2rem; color: var(--text-muted);">
+              🔍 No complaints match the active filters or search keyword.
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

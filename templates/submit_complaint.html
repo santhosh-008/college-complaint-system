@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Complaint - {{ portal_title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 820px; margin: 0 auto;">
+
+  <!-- Page Breadcrumb / Header -->
+  <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">✍️ Submit Grievance / Complaint</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Fill in the details below. Our college grievance committee will review and respond promptly.</p>
+    </div>
+    <a href="{{ url_for('student_dashboard') }}" class="btn btn-secondary btn-sm">
+      &larr; Back to Dashboard
+    </a>
+  </div>
+
+  <div class="card">
+    <form action="{{ url_for('submit_complaint') }}" method="POST" enctype="multipart/form-data" id="complaintForm">
+      
+      <!-- Complaint Title -->
+      <div class="form-group">
+        <label for="title" class="form-label">
+          Complaint Title <span class="required">*</span>
+          <span class="help-text">(Summarize the issue briefly)</span>
+        </label>
+        <input 
+          type="text" 
+          id="title" 
+          name="title" 
+          class="form-control" 
+          placeholder="e.g. Wi-Fi router disconnection in CSE Lab 2" 
+          required 
+          maxlength="150"
+        >
+      </div>
+
+      <!-- Category & Department (Row) -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="category" class="form-label">
+            Complaint Category <span class="required">*</span>
+          </label>
+          <select id="category" name="category" class="form-select" required>
+            <option value="" disabled selected>-- Select Issue Category --</option>
+            {% for cat in categories %}
+              <option value="{{ cat }}">{{ cat }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="department" class="form-label">
+            Relevant Department / Sector <span class="required">*</span>
+          </label>
+          <select id="department" name="department" class="form-select" required>
+            <option value="" disabled selected>-- Select Department --</option>
+            {% for dept in departments %}
+              <option value="{{ dept }}" {% if dept == session.get('department') %}selected{% endif %}>
+                {{ dept }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <!-- Priority -->
+      <div class="form-group">
+        <label class="form-label">
+          Priority Level <span class="required">*</span>
+        </label>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.35rem;">
+          <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.9rem;">
+            <input type="radio" name="priority" value="Low"> Low
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.9rem;">
+            <input type="radio" name="priority" value="Medium" checked> Medium (Default)
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.9rem;">
+            <input type="radio" name="priority" value="High"> High
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.9rem;">
+            <input type="radio" name="priority" value="Urgent"> Urgent (Immediate attention)
+          </label>
+        </div>
+      </div>
+
+      <!-- Detailed Description -->
+      <div class="form-group">
+        <label for="description" class="form-label">
+          Detailed Description <span class="required">*</span>
+          <span class="help-text">(Explain location, time, and specific trouble experienced)</span>
+        </label>
+        <textarea 
+          id="description" 
+          name="description" 
+          class="form-control" 
+          rows="5" 
+          placeholder="Please describe the grievance with as much detail as possible so the concerned department can take fast action..." 
+          required
+        ></textarea>
+      </div>
+
+      <!-- Attachment (Optional) -->
+      <div class="form-group">
+        <label for="attachment" class="form-label">
+          Optional Supporting Attachment
+          <span class="help-text">(Photo / Screenshot / Document, Max 8MB)</span>
+        </label>
+        <div class="file-input-wrapper">
+          <label for="attachment" class="file-input-label">
+            <span class="upload-icon">📁</span>
+            <span><strong>Click here to upload a file</strong> or drag & drop</span>
+            <span style="font-size: 0.78rem; color: #94a3b8;">Supported formats: PNG, JPG, JPEG, PDF, DOC, DOCX, TXT</span>
+          </label>
+          <input type="file" id="attachment" name="attachment" accept=".png,.jpg,.jpeg,.gif,.pdf,.doc,.docx,.txt">
+          <div id="selectedFileName" class="selected-filename" style="display: none;"></div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border);">
+        <a href="{{ url_for('student_dashboard') }}" class="btn btn-secondary">
+          Cancel
+        </a>
+        <button type="submit" class="btn btn-primary" id="submitFormBtn" style="padding-left: 2rem; padding-right: 2rem;">
+          🚀 Submit Complaint
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+{% endblock %}

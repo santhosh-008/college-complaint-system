@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}Administrator Dashboard - {{ portal_title }}{% endblock %}
+
+{% block content %}
+<!-- Welcome & Board Overview -->
+<div class="welcome-card" style="background: linear-gradient(135deg, #091b2e 0%, #173b5f 100%);">
+  <div class="welcome-info">
+    <h2>Grievance Redressal Board 🛡️</h2>
+    <p>Central administration desk for monitoring, investigating, and resolving student grievances across all college departments.</p>
+    <div class="welcome-meta">
+      <span>👤 <strong>Admin:</strong> {{ session.get('name') }}</span>
+      <span>🏢 <strong>Cell:</strong> {{ session.get('department') }}</span>
+      <span>📅 <strong>Session:</strong> Academic Year {{ current_year }}</span>
+    </div>
+  </div>
+  <div class="welcome-actions">
+    <a href="{{ url_for('admin_students') }}" class="btn btn-secondary">
+      👥 Student Directory
+    </a>
+  </div>
+</div>
+
+<!-- KPI Stats Grid -->
+<div class="stats-grid">
+  <div class="stat-card total">
+    <div class="stat-icon">📊</div>
+    <div class="stat-data">
+      <h3>{{ stats.total }}</h3>
+      <p>Total Complaints</p>
+    </div>
+  </div>
+
+  <div class="stat-card pending">
+    <div class="stat-icon">⏳</div>
+    <div class="stat-data">
+      <h3>{{ stats.pending }}</h3>
+      <p>Pending Review</p>
+    </div>
+  </div>
+
+  <div class="stat-card in-progress">
+    <div class="stat-icon">⚙️</div>
+    <div class="stat-data">
+      <h3>{{ stats.in_progress }}</h3>
+      <p>Under Action / In Progress</p>
+    </div>
+  </div>
+
+  <div class="stat-card resolved">
+    <div class="stat-icon">✅</div>
+    <div class="stat-data">
+      <h3>{{ stats.resolved }}</h3>
+      <p>Resolved</p>
+    </div>
+  </div>
+
+  <div class="stat-card rejected">
+    <div class="stat-icon">🛑</div>
+    <div class="stat-data">
+      <h3>{{ stats.rejected }}</h3>
+      <p>Rejected / Closed</p>
+    </div>
+  </div>
+</div>
+
+<!-- Search & Live Filters Bar -->
+<div class="filter-bar">
+  <div class="filter-group">
+    <!-- Live Search -->
+    <div class="search-input-wrap">
+      <span class="search-icon-inside">🔍</span>
+      <input type="text" id="searchInput" class="form-control" placeholder="Search by Student ID, Name, Title, ID...">
+    </div>
+
+    <!-- Status Filter -->
+    <div style="min-width: 140px;">
+      <select id="statusFilter" class="form-select">
+        <option value="">All Statuses</option>
+        {% for st in statuses %}
+          <option value="{{ st }}">{{ st }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Category Filter -->
+    <div style="min-width: 150px;">
+      <select id="categoryFilter" class="form-select">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+          <option value="{{ cat }}">{{ cat }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Department Filter -->
+    <div style="min-width: 180px;">
+      <select id="deptFilter" class="form-select">
+        <option value="">All Departments</option>
+        {% for dept in departments %}
+          <option value="{{ dept }}">{{ dept }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Priority Filter -->
+    <div style="min-width: 130px;">
+      <select id="priorityFilter" class="form-select">
+        <option value="">All Priorities</option>
+        {% for p in priorities %}
+          <option value="{{ p }}">{{ p }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <button type="button" id="resetFiltersBtn" class="btn btn-secondary btn-sm">
+      Reset Filters
+    </button>
+    <span id="filterCount" style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted);"></span>
+  </div>
+</div>
+
+<!-- Complaints Board Table -->
+<div class="card" style="padding: 0; overflow: hidden;">
+  <div class="table-responsive" style="border: none;">
+    <table class="table" id="complaintsTable">
+      <thead>
+        <tr>
+          <th>Complaint ID</th>
+          <th>Student Details</th>
+          <th>Title & Category</th>
+          <th>Department</th>
+          <th>Priority</th>
+          <th>Lodged Date</th>
+          <th>Status</th>
+          <th style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if complaints %}
+          {% for c in complaints %}
+            <tr 
+              data-status="{{ c.status }}" 
+              data-category="{{ c.category }}" 
+              data-priority="{{ c.priority }}" 
+              data-dept="{{ c.department }}"
+            >
+              <!-- Complaint ID -->
+              <td>
+                <a href="{{ url_for('complaint_details', complaint_id=c.complaint_id) }}" class="complaint-id-link">
+                  {{ c.complaint_id }}
+                </a>
+              </td>
+
+              <!-- Student Details -->
+              <td>
+                <div style="font-weight: 600; color: var(--text-main);">{{ c.student_name }}</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); font-family: monospace;">
+                  {{ c.student_id }} &bull; {{ c.student_dept }}
+                </div>
+              </td>
+
+              <!-- Complaint Title & Category -->
+              <td>
+                <div style="font-weight: 600; color: var(--text-main); font-size: 0.92rem; max-width: 260px;">
+                  {{ c.title }}
+                </div>
+                <div style="margin-top: 0.25rem;">
+                  <span class="badge badge-category">{{ c.category }}</span>
+                  {% if c.admin_response %}
+                    <span style="font-size: 0.75rem; color: #059669; font-weight: 600; margin-left: 0.25rem;">✓ Replied</span>
+                  {% endif %}
+                </div>
+              </td>
+
+              <!-- Department -->
+              <td>
+                <span style="font-size: 0.85rem; color: var(--text-secondary);">{{ c.department }}</span>
+              </td>
+
+              <!-- Priority -->
+              <td>
+                <span class="badge badge-priority-{{ c.priority | lower }}">{{ c.priority }}</span>
+              </td>
+
+              <!-- Lodged Date -->
+              <td>
+                <span style="color: var(--text-secondary); font-size: 0.85rem;">{{ c.created_at[:10] }}</span>
+              </td>
+
+              <!-- Status -->
+              <td>
+                {% if c.status == 'Pending' %}
+                  <span class="badge badge-status-pending"><span class="badge-dot"></span> Pending</span>
+                {% elif c.status == 'In Progress' %}
+                  <span class="badge badge-status-in-progress"><span class="badge-dot"></span> In Progress</span>
+                {% elif c.status == 'Resolved' %}
+                  <span class="badge badge-status-resolved"><span class="badge-dot"></span> Resolved</span>
+                {% else %}
+                  <span class="badge badge-status-rejected"><span class="badge-dot"></span> {{ c.status }}</span>
+                {% endif %}
+              </td>
+
+              <!-- Actions -->
+              <td style="text-align: right;">
+                <div style="display: inline-flex; gap: 0.4rem;">
+                  <a href="{{ url_for('complaint_details', complaint_id=c.complaint_id) }}" class="btn btn-primary btn-sm" title="View details and update status">
+                    Manage / Update &rarr;
+                  </a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" class="table-empty">
+              <div class="empty-state">
+                <div class="empty-state-icon">🎉</div>
+                <h3>No Complaints Lodged</h3>
+                <p>There are no complaints currently registered in the database.</p>
+              </div>
+            </td>
+          </tr>
+        {% endif %}
+
+        <!-- Row displayed dynamically when live search finds nothing -->
+        <tr id="noResultsRow" style="display: none;">
+          <td colspan="8" class="table-empty">
+            <div style="padding: 2.5rem; color: var(--text-muted);">
+              🔍 No complaints match the selected filter criteria or keyword.
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
